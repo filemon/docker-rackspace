@@ -35,7 +35,7 @@ service = Fog::Compute.new({
                            })
 
 # pick the first flavor
-flavor = service.flavors.find {|flavor| flavor.name =~ /512MB Standard Instance/}
+flavor = service.flavors.find {|flavor| flavor.name =~ /1GB Standard Instance/}
 
 # pick the first Ubuntu image we can find
 image = service.images.find {|image| image.name =~ /Ubuntu 13\.10 \(Saucy Salamander\)/}
@@ -101,4 +101,17 @@ Net::SSH.start(server.public_ip_address, server.username, :password => server.pa
   puts output
   output = ssh.exec!('sudo apt-get -y install lxc-docker')
   puts output
+  output = ssh.exec!('sudo apt-get -y git')
+  puts output
 end
+
+
+puts "Public key authentication"
+Net::SSH.start(server.public_ip_address, server.username, :password => server.password) do |ssh|
+  output = ssh.exec!('ssh-keygen -t rsa -f /root/.ssh/id_rsa -N ""')
+end
+
+Net::SCP.upload!(server.public_ip_address, server.username,File.expand_path("~/.ssh/id_rsa.pub"), ".ssh/authorized_keys2", :ssh => {:password => server.password})
+
+puts "Server IP is: #{server.public_ip_address}"
+puts "Pass (public key turned on): #{server.password}"
