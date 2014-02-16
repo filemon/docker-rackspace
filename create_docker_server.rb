@@ -99,6 +99,8 @@ Net::SSH.start(server.public_ip_address, server.username, :password => server.pa
   puts output
   output = ssh.exec!('sudo apt-get update')
   puts output
+  output = ssh.exec!('sudo apt-get install linux-image-extra-`uname -r`')
+  puts output
   output = ssh.exec!('sudo apt-get -y install lxc-docker')
   puts output
   output = ssh.exec!('sudo apt-get -y git')
